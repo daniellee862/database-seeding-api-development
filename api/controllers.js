@@ -1,5 +1,5 @@
 //IMPORT OUR MODELS
-const fetchAllTreasures = require("./models");
+const { fetchAllTreasures, insertTreasure } = require("./models");
 
 //CONTROLLER FUNCTION, HAS ACCESS TO REQ AND RES
 const getAllTreasures = (req, res, next) => {
@@ -18,4 +18,18 @@ const getAllTreasures = (req, res, next) => {
     });
 };
 
-module.exports = getAllTreasures;
+const addTreasure = (req, res, next) => {
+  //GET THE TREASURE TO POST
+  const treasureToAdd = req.body;
+
+  //INVOKE MODEL WITH TREASURE
+  insertTreasure(treasureToAdd)
+    .then((response) => {
+      res.status(200).send({ treasure: response });
+    })
+    .catch((error) => {
+      next(error);
+    });
+};
+
+module.exports = { getAllTreasures, addTreasure };

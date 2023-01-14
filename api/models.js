@@ -1,5 +1,6 @@
 //IMPORT OUR DATABASE
 const database = require("../db/index");
+const format = require("pg-format");
 
 //MODEL TO QUERY DB AND SEND DATA TO CLIENT
 const fetchAllTreasures = (
@@ -9,7 +10,7 @@ const fetchAllTreasures = (
 ) => {
   const acceptedSortQueries = ["treasure_name", "age", "cost_at_auction"];
   const acceptedOrderQueries = ["asc", "desc"];
-  const acceptedColourQueries = ["gold"];
+  // const acceptedColourQueries = ["gold"];
 
   let queryString = `SELECT 
   treasures.treasure_id, 
@@ -41,4 +42,28 @@ const fetchAllTreasures = (
   });
 };
 
-module.exports = fetchAllTreasures;
+const insertTreasure = (treasureToAdd) => {
+  const { treasure_name, colour, age, cost_at_auction, shop_id } =
+    treasureToAdd;
+  const sqlInsertString = `
+  INSERT INTO treasures (
+    treasure_name, colour, age, cost_at_auction, shop_id
+  )
+  VALUES
+  (%L)
+  RETURNING *
+  `;
+  const completeInsertString = format(sqlInsertString, [
+    treasure_name,
+    colour,
+    age,
+    cost_at_auction,
+    shop_id,
+  ]);
+
+  return database.query(completeInsertString).then((result) => {
+    return result.rows[0];
+  });
+};
+
+module.exports = { fetchAllTreasures, insertTreasure };

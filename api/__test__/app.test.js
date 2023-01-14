@@ -2,10 +2,9 @@
 const request = require("supertest");
 //IMPORT OUR EXPRESS APP
 const app = require("../app.js");
-//IMPORT CONTROLLERS
-const getAllTreasures = require("../controllers");
+
 //IMPORT MODELS
-const fetchAllTreasures = require("../models");
+const { fetchAllTreasures } = require("../models");
 //DB CONNECTION
 const database = require("../../db/index");
 // INDEX; SHOPS.JS + TREASURES.JS
@@ -24,7 +23,7 @@ afterAll(() => {
 });
 
 //DESCRIBE BLOCK FOR TESTS
-describe("END TO END: /api/treasures", () => {
+describe("END TO END: GET /api/treasures", () => {
   test("test endpoint replies with 200", () => {
     //REQUEST, GET, AND FIRST EXPECT = SUPERTEST
     return request(app)
@@ -102,7 +101,7 @@ describe("END TO END: /api/treasures", () => {
   //   });
 });
 
-describe("MODEL TESTS: fetchAllTreasures", () => {
+describe("MODEL TESTS: /api/treasures. fetchAllTreasures()", () => {
   test("should return all treasures sorted by age ascending as default", () => {
     return fetchAllTreasures().then((result) => {
       expect(result).toBeDefined();
@@ -115,5 +114,29 @@ describe("MODEL TESTS: fetchAllTreasures", () => {
       expect(result[0]).toHaveProperty("shop_name");
       expect(result[0].age).toBeLessThanOrEqual(result[result.length - 1].age);
     });
+  });
+});
+
+describe('END TO END: POST "/api/treasures"', () => {
+  test("HTTP POST request inserts sent object into database and returns object with its shop id ", () => {
+    return request(app)
+      .post("/api/treasures")
+      .send({
+        treasure_name: "Daniel",
+        colour: "Green",
+        age: "36",
+        cost_at_auction: 1986,
+        shop_id: 5,
+      })
+      .expect(200)
+      .then((response) => {
+        const treasure = response.body.treasure;
+        expect(treasure).toHaveProperty("treasure_id", 27);
+        expect(treasure).toHaveProperty("treasure_name", "Daniel");
+        expect(treasure).toHaveProperty("colour", "Green");
+        expect(treasure).toHaveProperty("age", 36);
+        expect(treasure).toHaveProperty("cost_at_auction", 1986);
+        expect(treasure).toHaveProperty("shop_id", 5);
+      });
   });
 });

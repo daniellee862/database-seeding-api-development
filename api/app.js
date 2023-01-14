@@ -2,7 +2,7 @@
 const express = require("express");
 
 //IMPORT CONTROLLER
-const getAllTreasures = require("./controllers");
+const { getAllTreasures, addTreasure } = require("./controllers");
 
 //CREATE APP WITH EXPRESS.JS INVOCATION
 const app = express();
@@ -13,6 +13,8 @@ app.use(express.json());
 /* APP(path, callback/controller) >>> CONTROLLER(parse req + res) >>> MODEL(parse data) */
 
 app.get("/api/treasures", getAllTreasures);
+
+app.post("/api/treasures", addTreasure);
 
 //EXPRESS ERROR HANDLING MIDDLEWARE
 app.use((error, req, res, next) => {
